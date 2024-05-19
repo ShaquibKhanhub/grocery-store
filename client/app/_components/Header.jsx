@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Global from "../_utils/Global";
+import Link from "next/link";
 
 const Header = () => {
   const [categoryList, setCategoryList] = useState([]);
@@ -48,19 +49,21 @@ const Header = () => {
                 process.env.NEXT_PUBLIC_BACKEND_BASE_URL + iconUrl;
               // console.log("Complete URL for category " + ind + ":", imageUrl);
               return (
-                <DropdownMenuItem
-                  key={ind}
-                  className="flex gap-4 items-center cursor-pointer"
-                >
-                  <Image
-                    src={imageUrl}
-                    unoptimized={true}
-                    alt="icon"
-                    width={30}
-                    height={30}
-                  />
-                  <h2 className="text-lg">{cat?.attributes?.name}</h2>
-                </DropdownMenuItem>
+                <Link href={`/products-category/${cat?.attributes?.name}`}>
+                  <DropdownMenuItem
+                    key={ind}
+                    className="flex gap-4 items-center cursor-pointer"
+                  >
+                    <Image
+                      src={imageUrl}
+                      unoptimized={true}
+                      alt="icon"
+                      width={30}
+                      height={30}
+                    />
+                    <h2 className="text-lg">{cat?.attributes?.name}</h2>
+                  </DropdownMenuItem>
+                </Link>
               );
             })}
           </DropdownMenuContent>

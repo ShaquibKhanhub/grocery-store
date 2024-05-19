@@ -68,7 +68,10 @@ const ProductItemDetail = ({ product }) => {
               <h2>{quantity}</h2>
               <button onClick={() => handleQuantity(+1)}>+</button>
             </div>
-            <h2 className="text-2xl font-bold"> = ${(quantity * productTotalPrice).toFixed(2)}</h2>
+            <h2 className="text-2xl font-bold">
+              {" "}
+              = ${(quantity * productTotalPrice).toFixed(2)}
+            </h2>
           </div>
 
           <Button className="flex gap-3">

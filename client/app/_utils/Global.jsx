@@ -1,7 +1,7 @@
 const { default: axios } = require("axios");
 
 const axiosClient = axios.create({
-  baseURL: "http://192.168.1.8:1337/api",
+  baseURL: "http://192.168.1.4:1337/api",
 });
 
 const getCategory = () => axiosClient.get("/categories?populate=*");
@@ -15,4 +15,16 @@ const getCategoryList = () =>
 const getAllProducts = () =>
   axiosClient.get("/products?populate=*").then((res) => res.data.data);
 
-export default { getCategory, getSlider, getCategoryList, getAllProducts };
+// Define an asynchronous function to fetch products by category
+const getProductsByCategory = (category) =>
+  axiosClient
+    .get(`/products?filters[categories][name][$in]=${category}&populate=*`)
+    .then((res) => res.data.data);
+
+export default {
+  getCategory,
+  getSlider,
+  getCategoryList,
+  getAllProducts,
+  getProductsByCategory,
+};
