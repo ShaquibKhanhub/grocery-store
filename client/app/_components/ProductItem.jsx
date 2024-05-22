@@ -12,7 +12,6 @@ import {
 import ProductItemDetail from "./ProductItemDetail";
 
 const ProductItem = ({ product }) => {
-  //   console.log(product);
   return (
     <div className="p-2 md:p-6 flex flex-col items-center justify-center gap-3 border rounded-lg hover:scale-105 hover:shadow-lg transition-all ease-in-out cursor-pointer">
       <Image
@@ -42,9 +41,8 @@ const ProductItem = ({ product }) => {
         </h2>
       </div>
 
-      <Dialog asChild>
-        <DialogTrigger>
-          {" "}
+      <Dialog>
+        <DialogTrigger asChild>
           <Button
             variant="outline"
             className="text-primary hover:text-white hover:bg-primary"
@@ -54,6 +52,7 @@ const ProductItem = ({ product }) => {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
+            <DialogTitle>{product.attributes.name}</DialogTitle>
             <DialogDescription>
               <ProductItemDetail product={product} />
             </DialogDescription>

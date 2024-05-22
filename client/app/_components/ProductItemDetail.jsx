@@ -1,21 +1,62 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { ShoppingBasket } from "lucide-react";
+import { LoaderCircle, LoaderIcon, ShoppingBasket } from "lucide-react";
 import Image from "next/image";
-import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useContext, useState } from "react";
+import Global from "../_utils/Global";
+import { toast } from "sonner";
+import { UpdateCartContext } from "../_context/UpdateCartContext";
 
 const ProductItemDetail = ({ product }) => {
+  const jwt = sessionStorage.getItem("jwt");
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  const {updateCart,setUpdateCart} = useContext(UpdateCartContext)
+  const router = useRouter();
   const [productTotalPrice, setProductTotalPrice] = useState(
     product.attributes.sellingPrice
       ? product.attributes.sellingPrice
       : product.attributes.mrp
   );
+
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const addToCart = async () => {
+    setLoading(true);
+    if (!jwt) {
+      router.push("/sign-in");
+      setUpdateCart(!updateCart)
+      setLoading(false);
+      return;
+    }
+    const data = {
+      data: {
+        quantity: quantity,
+        amount: (quantity * productTotalPrice).toFixed(2),
+        products: product.id,
+        users_permissions_users: user.id,
+        userId: user.id,
+      },
+    };
+    console.log("Data being sent to cart:", data);
+    try {
+      const res = await Global.addToCart(data, jwt);
+      console.log("Response from addToCart:", res);
+      toast("Added to Cart");
+      setUpdateCart(!updateCart)
+      setLoading(false);
+    } catch (e) {
+      console.log("Error while adding to cart:", e);
+      toast("Error while adding to cart");
+      setLoading(false);
+    }
+  };
 
   const handleQuantity = (val) => {
     setQuantity((prev) => {
       const newQuantity = prev + val;
-      return newQuantity < 0 ? 0 : newQuantity;
+      return newQuantity < 1 ? 1 : newQuantity;
     });
   };
 
@@ -66,7 +107,7 @@ const ProductItemDetail = ({ product }) => {
                 -
               </button>
               <h2>{quantity}</h2>
-              <button onClick={() => handleQuantity(+1)}>+</button>
+              <button onClick={() => handleQuantity(1)}>+</button>
             </div>
             <h2 className="text-2xl font-bold">
               {" "}
@@ -74,9 +115,17 @@ const ProductItemDetail = ({ product }) => {
             </h2>
           </div>
 
-          <Button className="flex gap-3">
+          <Button
+            className="flex gap-3"
+            onClick={() => addToCart()}
+            disabled={loading}
+          >
             <ShoppingBasket />
-            Add To Cart
+            {loading ? (
+              <LoaderCircle className="animate-spin" />
+            ) : (
+              "Add to Cart"
+            )}
           </Button>
         </div>
         <h2>
