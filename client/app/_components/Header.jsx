@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
   SheetHeader,
@@ -45,7 +46,15 @@ const Header = () => {
   const router = useRouter();
   const [totalCartItem, setTotalCartItem] = useState(0);
   const [cartItemList, setCartItemList] = useState([]);
+  const [subTotal, setSubTotal] = useState(0);
 
+  useEffect(() => {
+    let total = 0;
+    cartItemList.forEach((item) => {
+      total += item.amount;
+    });
+    setSubTotal(total.toFixed(2));
+  }, [cartItemList]);
   /**
    * Get Category List
    */
@@ -70,8 +79,8 @@ const Header = () => {
    *  Used to get Total Cart Item
    */
   const getCartItems = async () => {
-    const cartItemList_ = await Global.getCartItem(user.id, jwt);
-    console.log(cartItemList);
+    const cartItemList_ = await Global.getCartItem(user?.id, jwt);
+
     setTotalCartItem(cartItemList_?.length);
     setCartItemList(cartItemList_);
   };
@@ -79,7 +88,7 @@ const Header = () => {
   const onDeleteItem = (id) => {
     Global.deleteCartItem(id, jwt).then((res) => {
       toast("item removed!");
-      getCartItems()
+      getCartItems();
     });
   };
 
@@ -142,7 +151,7 @@ const Header = () => {
       </div>
       <div className="flex gap-5 items-center">
         <Sheet>
-          <SheetTrigger asChild>
+          <SheetTrigger>
             <h2 className="flex gap-2 items-center text-lg">
               <ShoppingBasket size={27} />
               <span className="bg-primary text-white px-2 rounded-full">
@@ -162,6 +171,21 @@ const Header = () => {
                 />
               </SheetDescription>
             </SheetHeader>
+            <SheetClose asChild>
+              <div
+                className="absolute w-[90%] bottom-6 flex flex-col 
+       "
+              >
+                <h2 className="text-lg font-bold flex justify-between">
+                  SubTotal <span>${subTotal}</span>
+                </h2>
+                <Button
+                  onClick={() => router.push(jwt ? "/checkout" : "/sign-in")}
+                >
+                  Checkout
+                </Button>
+              </div>
+            </SheetClose>
           </SheetContent>
         </Sheet>
 
