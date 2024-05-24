@@ -7,6 +7,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 import { ArrowBigRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
@@ -21,7 +22,6 @@ const Checkout = () => {
   const [zip, setZip] = useState("");
   const [address, setAddress] = useState("");
   const [totalAmount, setTotalAmount] = useState(0);
-  console.log(totalAmount);
 
   const deliveryCharge = 15;
   const taxRate = 0.09;
@@ -67,9 +67,30 @@ const Checkout = () => {
     return totalAmount.toFixed(2);
   };
 
-  const onApprove = (data)=>{
-console.log(data);
-  }
+  const onApprove = (data) => {
+    console.log(data);
+    const payload = {
+      data: {
+        paymentId: data.paymentId,
+        totalOrderAmount: totalAmount,
+        username: username,
+        email: email,
+        phone: phone,
+        zip: zip,
+        address: address,
+        orderItemList: cartItemList,
+        userId: user.id,
+      },
+    };
+    Global.createOrder(payload, jwt).then((res) => {
+      toast("Order Places Successfully!");
+      cartItemList.forEach((item, ind) => {
+     
+        Global.deleteCartItem(item.id,jwt).then((res) => {});
+      });
+      router.replace("/order-confirmation");
+    });
+  };
 
   return (
     <div>
@@ -128,9 +149,12 @@ console.log(data);
             <h2 className="font-bold flex justify-between">
               Total: <span>${totalAmount}</span>
             </h2>
-
+            {/* <Button onClick={() => onApprove({ paymentId: 123 })}>
+              Payment
+            </Button> */}
             {totalAmount > 15 && (
               <PayPalButtons
+                disabled={!(username && email && address && zip)}
                 style={{ layout: "horizontal" }}
                 onApprove={onApprove}
                 createOrder={(data, actions) => {

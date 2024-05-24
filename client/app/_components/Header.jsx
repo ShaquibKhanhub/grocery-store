@@ -38,8 +38,8 @@ import CartItemList from "./CartItemList";
 import { toast } from "sonner";
 
 const Header = () => {
-  const user = JSON.parse(sessionStorage.getItem("user"));
-  const jwt = sessionStorage.getItem("jwt");
+  let user;
+  let jwt;
   const { updateCart, setUpdateCart } = useContext(UpdateCartContext);
   const [categoryList, setCategoryList] = useState([]);
   const isLogged = sessionStorage.getItem("jwt") ? true : false;
@@ -91,6 +91,14 @@ const Header = () => {
       getCartItems();
     });
   };
+
+  if (typeof window !== "undefined") {
+    user = window.JSON.parse(sessionStorage.getItem("user"));
+  }
+
+  if (typeof window !== "undefined") {
+    jwt = window.sessionStorage.getItem("jwt");
+  }
 
   return (
     <div className="p-5 shadow flex justify-between">
@@ -202,7 +210,9 @@ const Header = () => {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>My Order</DropdownMenuItem>
+              <Link href={"/my-order"}>
+                <DropdownMenuItem>My Order</DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <LogOutIcon
                   className="cursor-pointer"

@@ -56,7 +56,9 @@ const getCartItem = (userId, jwt) =>
             .url,
         actualPrice: item.attributes.products?.data[0].attributes.mrp,
         id: item.id,
+        product: item.attributes.products?.data[0].id,
       }));
+
       return cartItemList;
     });
 
@@ -66,6 +68,31 @@ const deleteCartItem = (id, jwt) =>
       Authorization: `Bearer ${jwt}`,
     },
   });
+
+const createOrder = (data, jwt) =>
+  axiosClient.post(`/orders`, data, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+  });
+
+const getMyOrder = (userId, jwt) =>
+  axiosClient
+    .get(
+      `http://localhost:1337/api/orders?filters[userId][$eq]=${userId}&populate[orderItemList][populate][product][populate][images]=url`
+    )
+    .then((res) => {
+      const response = res.data.data;
+      const orderList = response.map((item) => ({
+        id: item.id,
+        totalOrderAmount: item.attributes.totalOrderAmount,
+        paymentId: item.attributes.paymentId,
+        orderItemList: item.attributes.orderItemList,
+        createdAt: item.attributes.createdAt,
+        status: item.attributes.Status,
+      }));
+      return orderList;
+    });
 
 export default {
   getCategory,
@@ -78,4 +105,6 @@ export default {
   addToCart,
   getCartItem,
   deleteCartItem,
+  createOrder,
+  getMyOrder,
 };
